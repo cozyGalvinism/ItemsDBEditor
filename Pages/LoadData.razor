@@ -1,0 +1,59 @@
+@using ItemDBEditor.Data
+@inject ItemService ItemsDB
+
+<h1>Items</h1>
+
+@if (items == null) {
+    <p><em>Loading items...</em></p>
+} else {
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Name</th>
+                <th>Prefab</th>
+                <th>Weight</th>
+                <th>Grist</th>
+                <th>Strifekind</th>
+                <th>Weaponsprite</th>
+                <th>CustomMade</th>
+                <th>Icon</th>
+                <th>Description</th>
+                <th>Tags</th>
+                <th>Speed</th>
+                <th>Spawn</th>
+                <th />
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in items)
+            {
+                <tr>
+                    <td>@item.Code</td>
+                    <td>@item.Name</td>
+                    <td>@item.Prefab</td>
+                    <td>@item.Weight</td>
+                    <td>@item.Grist</td>
+                    <td>@item.Strifekind</td>
+                    <td>@item.Weaponsprite</td>
+                    <td>@item.CustomMade</td>
+                    <td>@item.Icon</td>
+                    <td>@item.Description</td>
+                    <td>@string.Join(", ", item.Tags)</td>
+                    <td>@item.Speed</td>
+                    <td>@item.Spawn</td>
+                    <td><a name="edit-item-btn" id="edit-item-@item.Code" class="btn btn-primary" href="/edit/@item.Code" role="button">Edit</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+
+    private List<Item> items;
+
+    protected override async Task OnInitializedAsync() {
+        items = await ItemsDB.GetItems();
+    }
+}

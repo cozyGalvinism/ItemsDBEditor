@@ -1,0 +1,124 @@
+@page "/edit/{Code}"
+
+@using ItemDBEditor.Data
+@inject ItemService ItemsDB
+@inject NavigationManager NavManager
+
+<form action="#" method="POST">
+    @if (item == null) {
+        <p>Loading...</p>
+    }else {
+    <div class="form-group">
+		<label for="field-Name">Name</label>
+		<input type="text" name="form-control" id="field-Name" class="form-control" placeholder="" @bind="@Name" @oninput="@((e) => { Name=(string)e.Value;})">
+	</div>
+
+	<div class="form-group">
+		<label for="field-Prefab">Prefab</label>
+		<input type="text" name="form-control" id="field-Prefab" class="form-control" placeholder="" @bind="@Prefab" @oninput="@((e) => { Prefab=(string)e.Value;})">
+	</div>
+
+	<div class="form-group">
+		<label for="field-Weight">Weight</label>
+		<input type="text" name="form-control" id="field-Weight" class="form-control" placeholder="" @bind="@Weight" @oninput="@((e) => { Weight=(string)e.Value;})">
+	</div>
+
+	<div class="form-group">
+		<label for="field-Grist">Grist</label>
+		<input type="text" name="form-control" id="field-Grist" class="form-control" placeholder="" @bind="@Grist" @oninput="@((e) => { Grist=(string)e.Value;})">
+	</div>
+
+	<div class="form-group">
+		<label for="field-Strifekind">Strifekind</label>
+		<input type="text" name="form-control" id="field-Strifekind" class="form-control" placeholder="" @bind="@Strifekind" @oninput="@((e) => { Strifekind=(string)e.Value;})">
+	</div>
+
+	<div class="form-group">
+		<label for="field-Weaponsprite">Weaponsprite</label>
+		<input type="text" name="form-control" id="field-Weaponsprite" class="form-control" placeholder="" @bind="@Weaponsprite" @oninput="@((e) => { Weaponsprite=(string)e.Value;})">
+	</div>
+
+	<div class="form-group">
+		<label for="field-CustomMade">CustomMade</label>
+		<input type="text" name="form-control" id="field-CustomMade" class="form-control" placeholder="" @bind="@CustomMade" @oninput="@((e) => { CustomMade=(string)e.Value;})">
+	</div>
+
+	<div class="form-group">
+		<label for="field-Icon">Icon</label>
+		<input type="text" name="form-control" id="field-Icon" class="form-control" placeholder="" @bind="@Icon" @oninput="@((e) => { Icon=(string)e.Value;})">
+	</div>
+
+	<div class="form-group">
+		<label for="field-Description">Description</label>
+		<input type="text" name="form-control" id="field-Description" class="form-control" placeholder="" @bind="@Description" @oninput="@((e) => { Description=(string)e.Value;})">
+	</div>
+
+	<div class="form-group">
+		<label for="field-Tags">Tags</label>
+		<input type="text" name="form-control" id="field-Tags" class="form-control" placeholder="" @bind="@Tags" @oninput="@((e) => { Tags=(string)e.Value;})">
+	</div>
+
+	<div class="form-group">
+		<label for="field-Speed">Speed</label>
+		<input type="text" name="form-control" id="field-Speed" class="form-control" placeholder="" @bind="@Speed" @oninput="@((e) => { Speed=(string)e.Value;})">
+	</div>
+
+	<div class="form-group">
+		<label for="field-Spawn">Spawn</label>
+		<input type="text" name="form-control" id="field-Spawn" class="form-control" placeholder="" @bind="@Spawn" @oninput="@((e) => { Spawn=(string)e.Value;})">
+	</div>
+    <button type="submit" class="btn btn-primary" @onclick="SaveItem">Save</button>
+    }
+</form>
+
+@code {
+    [Parameter]
+    public string Code { get; set; }
+    public string Name { get; set; }
+    public string Prefab { get; set; }
+    public string Weight { get; set; }
+    public string Grist { get; set; }
+    public string Strifekind { get; set; }
+    public string Weaponsprite { get; set; }
+    public string CustomMade { get; set; }
+    public string Icon { get; set; }
+    public string Description { get; set; }
+    public string Tags { get; set; }
+    public string Speed { get; set; }
+    public string Spawn { get; set; }
+    private Item item;
+
+    protected override async Task OnInitializedAsync()
+    {
+        item = await ItemsDB.GetItem(Code);
+        Name = item.Name;
+        Prefab = item.Prefab;
+        Weight = item.Weight.ToString();
+        Grist = item.Grist.ToString();
+        Strifekind = item.Strifekind;
+        Weaponsprite = item.Weaponsprite;
+        CustomMade = item.CustomMade ? "j" : "n";
+        Icon = item.Icon;
+        Description = item.Description;
+        Tags = string.Join(",", item.Tags);
+        Speed = item.Speed.ToString();
+        Spawn = item.Spawn ? "1" : "0";
+    }
+
+    private async void SaveItem() {
+        item.Name = Name;
+        item.Prefab = Prefab;
+        item.Weight = double.Parse(Weight);
+        item.Grist = int.Parse(Grist);
+        item.Strifekind = Strifekind;
+        item.Weaponsprite = Weaponsprite;
+        item.CustomMade = CustomMade == "j";
+        item.Icon = Icon;
+        item.Description = Description;
+        item.Tags = Tags.Split(",").ToList();
+        item.Speed = long.Parse(Speed);
+        item.Spawn = Spawn == "1";
+        bool success = await ItemsDB.UpdateItem(item);
+        NavManager.NavigateTo("/");
+    }
+}
