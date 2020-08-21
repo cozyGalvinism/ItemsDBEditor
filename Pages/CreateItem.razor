@@ -1,21 +1,22 @@
-@page "/edit/{Code}"
+@page "/create"
 
 @using ItemDBEditor.Data
 @inject ItemService ItemsDB
 @inject NavigationManager NavManager
 
 <form action="javascript:void(0);">
-    @if (item == null) {
-        <p>Loading...</p>
-    }else {
+    <div class="form-group">
+		<label for="field-Name"><b>Code</b></label>
+		<input type="text" name="form-control" id="field-Code" class="form-control" placeholder="" @bind="@Code">
+	</div>
     <div class="form-group">
 		<label for="field-Name"><b>Name</b></label>
-		<input type="text" name="form-control" id="field-Name" class="form-control" placeholder="" @bind="@Name" @oninput="@((e) => { Name=(string)e.Value;})">
+		<input type="text" name="form-control" id="field-Name" class="form-control" placeholder="" @bind="@Name">
 	</div>
 
 	<div class="form-group">
 		<label for="field-Prefab"><b>Prefab</b></label>
-		<input type="text" name="form-control" id="field-Prefab" class="form-control" placeholder="" @bind="@Prefab" @oninput="@((e) => { Prefab=(string)e.Value;})">
+		<input type="text" name="form-control" id="field-Prefab" class="form-control" placeholder="" @bind="@Prefab">
 	</div>
 
 	<div class="form-group">
@@ -25,17 +26,17 @@
 
 	<div class="form-group">
 		<label for="field-Grist"><b>Grist</b></label>
-		<input type="number" name="form-control" id="field-Grist" class="form-control" placeholder="" @bind="@Grist" @oninput="@((e) => { Grist=(long)e.Value;})">
+		<input type="number" name="form-control" id="field-Grist" class="form-control" placeholder="" @bind="@Grist">
 	</div>
 
 	<div class="form-group">
 		<label for="field-Strifekind"><b>Strifekind</b></label>
-		<input type="text" name="form-control" id="field-Strifekind" class="form-control" placeholder="" @bind="@Strifekind" @oninput="@((e) => { Strifekind=(string)e.Value;})">
+		<input type="text" name="form-control" id="field-Strifekind" class="form-control" placeholder="" @bind="@Strifekind">
 	</div>
 
 	<div class="form-group">
 		<label for="field-Weaponsprite"><b>Weaponsprite</b></label>
-		<input type="text" name="form-control" id="field-Weaponsprite" class="form-control" placeholder="" @bind="@Weaponsprite" @oninput="@((e) => { Weaponsprite=(string)e.Value;})">
+		<input type="text" name="form-control" id="field-Weaponsprite" class="form-control" placeholder="" @bind="@Weaponsprite">
 	</div>
 
 	<div class="form-check">
@@ -45,22 +46,22 @@
 
 	<div class="form-group">
 		<label for="field-Icon"><b>Icon</b></label>
-		<input type="text" name="form-control" id="field-Icon" class="form-control" placeholder="" @bind="@Icon" @oninput="@((e) => { Icon=(string)e.Value;})">
+		<input type="text" name="form-control" id="field-Icon" class="form-control" placeholder="" @bind="@Icon">
 	</div>
 
 	<div class="form-group">
 		<label for="field-Description"><b>Description</b></label>
-		<textarea name="form-control" id="field-Description" rows="6" class="form-control" placeholder="" @bind="@Description" @oninput="@((e) => { Description=(string)e.Value;})"></textarea>
+		<textarea name="form-control" id="field-Description" rows="6" class="form-control" placeholder="" @bind="@Description"></textarea>
 	</div>
 
 	<div class="form-group">
 		<label for="field-Tags"><b>Tags</b></label>
-		<input type="text" name="form-control" id="field-Tags" class="form-control" placeholder="" @bind="@Tags" @oninput="@((e) => { Tags=(string)e.Value;})">
+		<input type="text" name="form-control" id="field-Tags" class="form-control" placeholder="" @bind="@Tags">
 	</div>
 
 	<div class="form-group">
 		<label for="field-Speed"><b>Speed</b></label>
-		<input type="number" name="form-control" id="field-Speed" class="form-control" placeholder="" @bind="@Speed" @oninput="@((e) => { Speed=(long)e.Value;})">
+		<input type="number" name="form-control" id="field-Speed" class="form-control" placeholder="" @bind="@Speed">
 	</div>
 
 	<div class="form-check">
@@ -68,11 +69,9 @@
 		<label for="field-Spawn" class="form-check-label"><b>Spawn</b></label>
 	</div>
     <button type="submit" class="btn btn-primary" @onclick="SaveItem">Save</button>
-    }
 </form>
 
 @code {
-    [Parameter]
     public string Code { get; set; }
     public string Name { get; set; }
     public string Prefab { get; set; }
@@ -88,24 +87,9 @@
     public bool Spawn { get; set; }
     private Item item;
 
-    protected override async Task OnInitializedAsync()
-    {
-        item = await ItemsDB.GetItem(Code);
-        Name = item.Name;
-        Prefab = item.Prefab;
-        Weight = item.Weight;
-        Grist = item.Grist;
-        Strifekind = item.Strifekind;
-        Weaponsprite = item.Weaponsprite;
-        CustomMade = item.CustomMade;
-        Icon = item.Icon;
-        Description = item.Description;
-        Tags = string.Join(",", item.Tags);
-        Speed = item.Speed;
-        Spawn = item.Spawn;
-    }
-
     private async void SaveItem() {
+        item = new Item();
+        item.Code = Code;
         item.Name = Name;
         item.Prefab = Prefab;
         item.Weight = Weight;
@@ -115,10 +99,10 @@
         item.CustomMade = CustomMade;
         item.Icon = Icon;
         item.Description = Description;
-        item.Tags = Tags.Split(",").ToList();
+        item.Tags = Tags == null ? new List<string>() : Tags.Split(",").ToList();
         item.Speed = Speed;
         item.Spawn = Spawn;
-        bool success = await ItemsDB.UpdateItem(item);
+        bool success = await ItemsDB.CreateItem(item);
         NavManager.NavigateTo("/");
     }
 }

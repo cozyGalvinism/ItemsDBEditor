@@ -6,6 +6,16 @@ using System.Collections.Generic;
 
 namespace ItemDBEditor.Data {
 
+    public static class Extensions {
+        public static void AddWithValueOrNull(this SqliteCommand cmd, string key, object value) {
+            if(value == null) {
+                cmd.Parameters.AddWithValue(key, DBNull.Value);
+            }else {
+                cmd.Parameters.AddWithValue(key, value);
+            }
+        }
+    }
+
     class Item {
 
         public string Code { get; set; }
@@ -58,6 +68,44 @@ namespace ItemDBEditor.Data {
             return tagList;
         }
 
+        public Task DeleteItem(string code) {
+            using (var connection = new SqliteConnection($"Data Source={dbPath}")) {
+                connection.Open();
+                var cmd = connection.CreateCommand();
+                cmd.CommandText = "DELETE FROM items WHERE code = $code;";
+                cmd.AddWithValueOrNull("$code", code);
+                int rows = cmd.ExecuteNonQuery();
+            }
+            return Task.CompletedTask;
+        }
+
+        public Task<bool> CreateItem(Item item) {
+            bool result = false;
+            using (var connection = new SqliteConnection($"Data Source={dbPath}"))
+            {
+                connection.Open();
+                var cmd = connection.CreateCommand();
+                cmd.CommandText = "INSERT INTO items VALUES ($code, $name, $prefab, $weight, $grist, $strifekind, $weaponsprite, $custommade, $icon, $description, $tags, $speed, $spawn);";
+                cmd.AddWithValueOrNull("$code", item.Code);
+                cmd.AddWithValueOrNull("$name", item.Name);
+                cmd.AddWithValueOrNull("$prefab", item.Prefab == null);
+                cmd.AddWithValueOrNull("$weight", item.Weight);
+                cmd.AddWithValueOrNull("$grist", item.Grist);
+                cmd.AddWithValueOrNull("$strifekind", item.Strifekind);
+                cmd.AddWithValueOrNull("$weaponsprite", item.Weaponsprite);
+                cmd.AddWithValueOrNull("$custommade", item.CustomMade == true ? "j" : "n");
+                cmd.AddWithValueOrNull("$icon", item.Icon);
+                cmd.AddWithValueOrNull("$description", item.Description);
+                cmd.AddWithValueOrNull("$tags", string.Join(",", item.Tags));
+                cmd.AddWithValueOrNull("$speed", item.Speed);
+                cmd.AddWithValueOrNull("$spawn", item.Spawn);
+
+                int rows = cmd.ExecuteNonQuery();
+                result = rows > 0;
+            }
+            return Task.FromResult(result);
+        }
+
         public Task<bool> UpdateItem(Item item) {
             bool result = false;
             using (var connection = new SqliteConnection($"Data Source={dbPath}"))
@@ -65,19 +113,19 @@ namespace ItemDBEditor.Data {
                 connection.Open();
                 var cmd = connection.CreateCommand();
                 cmd.CommandText = "UPDATE items SET name = $name, prefab = $prefab, weight = $weight, grist = $grist, strifekind = $strifekind, weaponsprite = $weaponsprite, custommade = $custommade, icon = $icon, description = $description, tags = $tags, speed = $speed, spawn = $spawn WHERE code = $code;";
-                cmd.Parameters.AddWithValue("$code", item.Code);
-                cmd.Parameters.AddWithValue("$name", item.Name);
-                cmd.Parameters.AddWithValue("$prefab", item.Prefab);
-                cmd.Parameters.AddWithValue("$weight", item.Weight);
-                cmd.Parameters.AddWithValue("$grist", item.Grist);
-                cmd.Parameters.AddWithValue("$strifekind", item.Strifekind);
-                cmd.Parameters.AddWithValue("$weaponsprite", item.Weaponsprite);
-                cmd.Parameters.AddWithValue("$custommade", item.CustomMade == true ? "j" : "n");
-                cmd.Parameters.AddWithValue("$icon", item.Icon);
-                cmd.Parameters.AddWithValue("$description", item.Description);
-                cmd.Parameters.AddWithValue("$tags", string.Join(",", item.Tags));
-                cmd.Parameters.AddWithValue("$speed", item.Speed);
-                cmd.Parameters.AddWithValue("$spawn", item.Spawn);
+                cmd.AddWithValueOrNull("$code", item.Code);
+                cmd.AddWithValueOrNull("$name", item.Name);
+                cmd.AddWithValueOrNull("$prefab", item.Prefab == null);
+                cmd.AddWithValueOrNull("$weight", item.Weight);
+                cmd.AddWithValueOrNull("$grist", item.Grist);
+                cmd.AddWithValueOrNull("$strifekind", item.Strifekind);
+                cmd.AddWithValueOrNull("$weaponsprite", item.Weaponsprite);
+                cmd.AddWithValueOrNull("$custommade", item.CustomMade == true ? "j" : "n");
+                cmd.AddWithValueOrNull("$icon", item.Icon);
+                cmd.AddWithValueOrNull("$description", item.Description);
+                cmd.AddWithValueOrNull("$tags", string.Join(",", item.Tags));
+                cmd.AddWithValueOrNull("$speed", item.Speed);
+                cmd.AddWithValueOrNull("$spawn", item.Spawn);
 
                 int rows = cmd.ExecuteNonQuery();
                 result = rows > 0;
