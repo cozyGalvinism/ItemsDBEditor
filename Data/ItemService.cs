@@ -88,12 +88,12 @@ namespace ItemDBEditor.Data {
                 cmd.CommandText = "INSERT INTO items VALUES ($code, $name, $prefab, $weight, $grist, $strifekind, $weaponsprite, $custommade, $icon, $description, $tags, $speed, $spawn);";
                 cmd.AddWithValueOrNull("$code", item.Code);
                 cmd.AddWithValueOrNull("$name", item.Name);
-                cmd.AddWithValueOrNull("$prefab", item.Prefab == null);
+                cmd.AddWithValueOrNull("$prefab", item.Prefab != null ? item.Prefab : "ItemObject");
                 cmd.AddWithValueOrNull("$weight", item.Weight);
                 cmd.AddWithValueOrNull("$grist", item.Grist);
                 cmd.AddWithValueOrNull("$strifekind", item.Strifekind);
                 cmd.AddWithValueOrNull("$weaponsprite", item.Weaponsprite);
-                cmd.AddWithValueOrNull("$custommade", item.CustomMade == true ? "j" : "n");
+                cmd.AddWithValueOrNull("$custommade", item.CustomMade == true ? "y" : "n");
                 cmd.AddWithValueOrNull("$icon", item.Icon);
                 cmd.AddWithValueOrNull("$description", item.Description);
                 cmd.AddWithValueOrNull("$tags", string.Join(",", item.Tags));
@@ -115,12 +115,12 @@ namespace ItemDBEditor.Data {
                 cmd.CommandText = "UPDATE items SET name = $name, prefab = $prefab, weight = $weight, grist = $grist, strifekind = $strifekind, weaponsprite = $weaponsprite, custommade = $custommade, icon = $icon, description = $description, tags = $tags, speed = $speed, spawn = $spawn WHERE code = $code;";
                 cmd.AddWithValueOrNull("$code", item.Code);
                 cmd.AddWithValueOrNull("$name", item.Name);
-                cmd.AddWithValueOrNull("$prefab", item.Prefab == null);
+                cmd.AddWithValueOrNull("$prefab", item.Prefab != null ? item.Prefab : "ItemObject");
                 cmd.AddWithValueOrNull("$weight", item.Weight);
                 cmd.AddWithValueOrNull("$grist", item.Grist);
                 cmd.AddWithValueOrNull("$strifekind", item.Strifekind);
                 cmd.AddWithValueOrNull("$weaponsprite", item.Weaponsprite);
-                cmd.AddWithValueOrNull("$custommade", item.CustomMade == true ? "j" : "n");
+                cmd.AddWithValueOrNull("$custommade", item.CustomMade == true ? "y" : "n");
                 cmd.AddWithValueOrNull("$icon", item.Icon);
                 cmd.AddWithValueOrNull("$description", item.Description);
                 cmd.AddWithValueOrNull("$tags", string.Join(",", item.Tags));
@@ -152,7 +152,7 @@ namespace ItemDBEditor.Data {
                         long grist = (long)reader["grist"];
                         string strifekind = reader["strifekind"] as string;
                         string weaponsprite = reader["weaponsprite"] as string;
-                        bool customMade = (reader["custommade"] as string) == "j";
+                        bool customMade = (reader["custommade"] as string) == "y";
                         string icon = reader["icon"] as string;
                         string description = reader["description"] as string;
                         List<string> tags = TagStringToList(reader["tags"] as string);
@@ -194,7 +194,7 @@ namespace ItemDBEditor.Data {
                         long grist = (long)reader["grist"];
                         string strifekind = reader["strifekind"] as string;
                         string weaponsprite = reader["weaponsprite"] as string;
-                        bool customMade = (reader["custommade"] as string) == "j";
+                        bool customMade = (reader["custommade"] as string) == "y";
                         string icon = reader["icon"] as string;
                         string description = reader["description"] as string;
                         List<string> tags = TagStringToList(reader["tags"] as string);
