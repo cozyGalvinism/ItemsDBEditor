@@ -16,7 +16,7 @@ namespace ItemDBEditor.Data {
         }
     }
 
-    class Item {
+    public class Item {
 
         public string Code { get; set; }
         public string Name { get; set; }
@@ -53,7 +53,7 @@ namespace ItemDBEditor.Data {
         }
     }
 
-    class ItemService
+    public class ItemService
     {
         private string dbPath = "items.db";
 

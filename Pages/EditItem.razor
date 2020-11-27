@@ -8,24 +8,29 @@
     @if (item == null) {
         <p>Loading...</p>
     }else {
+
     <div class="form-group">
-		<label for="field-Name"><b>Name</b></label>
-		<input type="text" name="form-control" id="field-Name" class="form-control" placeholder="" @bind="@Name" @oninput="@((e) => { Name=(string)e.Value;})">
+        <label for="field-Name"><b>Code</b></label>
+        <input type="text" name="form-control" id="field-Name" class="form-control" placeholder="" @bind="@Code" readonly="readonly">
+    </div>
+    <div class="form-group">
+		<label for="field-Name"><b>Name</b><span class="validation-message">*</span></label>
+		<input type="text" name="form-control" id="field-Name" class="form-control" placeholder="" @bind="@Name" @oninput="@((e) => { Name=(string)e.Value;})" required>
 	</div>
 
 	<div class="form-group">
-		<label for="field-Prefab"><b>Prefab</b></label>
-		<input type="text" name="form-control" id="field-Prefab" class="form-control" placeholder="" @bind="@Prefab" @oninput="@((e) => { Prefab=(string)e.Value;})">
+		<label for="field-Prefab"><b>Prefab</b><span class="validation-message">*</span></label>
+		<input type="text" name="form-control" id="field-Prefab" class="form-control" placeholder="" @bind="@Prefab" @oninput="@((e) => { Prefab=(string)e.Value;})" required>
 	</div>
 
 	<div class="form-group">
-		<label for="field-Weight"><b>Weight</b></label>
-		<input type="number" name="form-control" id="field-Weight" class="form-control" placeholder="" @bind="@Weight">
+		<label for="field-Weight"><b>Weight</b><span class="validation-message">*</span></label>
+		<input type="number" name="form-control" id="field-Weight" class="form-control" placeholder="" @bind="@Weight" required>
 	</div>
 
 	<div class="form-group">
-		<label for="field-Grist"><b>Grist</b></label>
-		<input type="number" name="form-control" id="field-Grist" class="form-control" placeholder="" @bind="@Grist" @oninput="@((e) => { Grist=(long)e.Value;})">
+		<label for="field-Grist"><b>Grist</b><span class="validation-message">*</span></label>
+		<input type="number" name="form-control" id="field-Grist" class="form-control" placeholder="" @bind="@Grist" @oninput="@((e) => { Grist=(long)e.Value;})" required>
 	</div>
 
 	<div class="form-group">
@@ -44,8 +49,8 @@
 	</div>
 
 	<div class="form-group">
-		<label for="field-Icon"><b>Icon</b></label>
-		<input type="text" name="form-control" id="field-Icon" class="form-control" placeholder="" @bind="@Icon" @oninput="@((e) => { Icon=(string)e.Value;})">
+		<label for="field-Icon"><b>Icon</b><span class="validation-message">*</span></label>
+		<input type="text" name="form-control" id="field-Icon" class="form-control" placeholder="" @bind="@Icon" @oninput="@((e) => { Icon=(string)e.Value;})" required>
 	</div>
 
 	<div class="form-group">
@@ -59,14 +64,16 @@
 	</div>
 
 	<div class="form-group">
-		<label for="field-Speed"><b>Speed</b></label>
-		<input type="number" name="form-control" id="field-Speed" class="form-control" placeholder="" @bind="@Speed" @oninput="@((e) => { Speed=(long)e.Value;})">
+		<label for="field-Speed"><b>Speed</b><span class="validation-message">*</span></label>
+		<input type="number" name="form-control" id="field-Speed" class="form-control" placeholder="" @bind="@Speed" @oninput="@((e) => { Speed=(long)e.Value;})" required>
 	</div>
-
-	<div class="form-check">
+        
+    <div class="form-check">
         <input type="checkbox" name="form-control" id="field-Spawn" class="form-check-input" placeholder="" @bind="@Spawn">
-		<label for="field-Spawn" class="form-check-label"><b>Spawn</b></label>
-	</div>
+        <label for="field-Spawn" class="form-check-label"><b>Spawn</b></label>
+    </div>
+    <span class="validation-message">* Field is required</span>
+    <br/>
     <button type="submit" class="btn btn-primary" @onclick="SaveItem">Save</button>
     }
 </form>
@@ -106,6 +113,7 @@
     }
 
     private async void SaveItem() {
+        if (string.IsNullOrEmpty(Name) || string.IsNullOrEmpty(Prefab) || string.IsNullOrEmpty(Icon)) return;
         item.Name = Name;
         item.Prefab = Prefab;
         item.Weight = Weight;
