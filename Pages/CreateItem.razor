@@ -104,7 +104,7 @@
         item.CustomMade = CustomMade;
         item.Icon = Icon;
         item.Description = Description;
-        item.Tags = Tags == null ? new List<string>() : Tags.Split(",").ToList();
+        item.Tags = Tags == null ? new List<string>() : Tags.Split(",").Select(t => t.Trim()).ToList();
         item.Speed = Speed;
         item.Spawn = Spawn;
         bool success = await ItemsDB.CreateItem(item);

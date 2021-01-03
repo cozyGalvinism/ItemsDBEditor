@@ -2,9 +2,19 @@
 @inject ItemService ItemsDB
 @inject NavigationManager NavManager
 
+@if (items != null) {
+    <a href="/create" class="btn btn-primary">Create new Item</a>
+    <hr>
+} 
 <h1>Items</h1>
 
-@if (items == null) {
+@if (!FileAvailable) {
+    <p>Please select your items.db!</p>
+    <BlazorInputFile.InputFile OnChange="FileSelected" />
+    @if(file != null) {
+        <button @onclick="Process">Load database</button>
+    }
+} else if (items == null) {
     <p><em>Loading items...</em></p>
 } else {
     <table class="table">
@@ -55,13 +65,32 @@
 @code {
 
     private List<Item> items;
+    private IFileListEntry file;
+    private bool FileAvailable {
+        get {
+            return System.IO.File.Exists("items.db");
+        }
+    }
 
     protected override async Task OnInitializedAsync() {
-        items = await ItemsDB.GetItems();
+        if(FileAvailable) {
+            items = await ItemsDB.GetItems();
+        }
     }
 
     private async void DeleteItem(string code) {
         await ItemsDB.DeleteItem(code);
         NavManager.NavigateTo("/", true);
+    }
+
+    private void FileSelected(IFileListEntry[] files) {
+        file = files.FirstOrDefault();
+    }
+
+    private async Task Process() {
+        var fs = System.IO.File.Create("items.db");
+        await file.Data.CopyToAsync(fs);
+        fs.Close();
+        items = await ItemsDB.GetItems();
     }
 }

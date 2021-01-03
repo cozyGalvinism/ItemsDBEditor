@@ -107,7 +107,7 @@
         CustomMade = item.CustomMade;
         Icon = item.Icon;
         Description = item.Description;
-        Tags = string.Join(",", item.Tags);
+        Tags = string.Join(", ", item.Tags);
         Speed = item.Speed;
         Spawn = item.Spawn;
     }
@@ -123,7 +123,7 @@
         item.CustomMade = CustomMade;
         item.Icon = Icon;
         item.Description = Description;
-        item.Tags = Tags.Split(",").ToList();
+        item.Tags = Tags.Split(",").Select(t => t.Trim()).ToList();
         item.Speed = Speed;
         item.Spawn = Spawn;
         bool success = await ItemsDB.UpdateItem(item);

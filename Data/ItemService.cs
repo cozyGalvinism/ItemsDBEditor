@@ -57,80 +57,65 @@ namespace ItemDBEditor.Data {
     {
         private string dbPath = "items.db";
 
-        private List<string> TagStringToList(string tags) {
-            if(tags == null) return new List<string>();
-            List<string> tagList = new List<string>();
-            if(!tags.Contains(",")) {
-                tagList.Add(tags);
-            }else {
-                tagList = tags.Split(',').ToList();
-            }
-            return tagList;
-        }
-
         public Task DeleteItem(string code) {
             using (var connection = new SqliteConnection($"Data Source={dbPath}")) {
                 connection.Open();
                 var cmd = connection.CreateCommand();
-                cmd.CommandText = "DELETE FROM items WHERE code = $code;";
+                cmd.CommandText = "DELETE FROM item_tags WHERE item = $code";
                 cmd.AddWithValueOrNull("$code", code);
                 int rows = cmd.ExecuteNonQuery();
+                
+                cmd = connection.CreateCommand();
+                cmd.CommandText = "DELETE FROM items WHERE code = $code;";
+                cmd.AddWithValueOrNull("$code", code);
+                rows = cmd.ExecuteNonQuery();
             }
             return Task.CompletedTask;
         }
 
         public Task<bool> CreateItem(Item item) {
-            bool result = false;
+            var results = new List<int>();
             using (var connection = new SqliteConnection($"Data Source={dbPath}"))
             {
                 connection.Open();
-                var cmd = connection.CreateCommand();
-                cmd.CommandText = "INSERT INTO items VALUES ($code, $name, $prefab, $weight, $grist, $strifekind, $weaponsprite, $custommade, $icon, $description, $tags, $speed, $spawn);";
-                cmd.AddWithValueOrNull("$code", item.Code);
-                cmd.AddWithValueOrNull("$name", item.Name);
-                cmd.AddWithValueOrNull("$prefab", item.Prefab != null ? item.Prefab : "ItemObject");
-                cmd.AddWithValueOrNull("$weight", item.Weight);
-                cmd.AddWithValueOrNull("$grist", item.Grist);
-                cmd.AddWithValueOrNull("$strifekind", item.Strifekind);
-                cmd.AddWithValueOrNull("$weaponsprite", item.Weaponsprite);
-                cmd.AddWithValueOrNull("$custommade", item.CustomMade == true ? "y" : "n");
-                cmd.AddWithValueOrNull("$icon", item.Icon);
-                cmd.AddWithValueOrNull("$description", item.Description);
-                cmd.AddWithValueOrNull("$tags", string.Join(",", item.Tags));
-                cmd.AddWithValueOrNull("$speed", item.Speed);
-                cmd.AddWithValueOrNull("$spawn", item.Spawn);
+                using(var cmd = connection.CreateCommand()) {
+                    cmd.CommandText = "INSERT INTO items VALUES ($code, $name, $prefab, $weight, $grist, $strifekind, $weaponsprite, $custommade, $icon, $description, $tags, $speed, $spawn);";
+                    cmd.AddWithValueOrNull("$code", item.Code);
+                    cmd.AddWithValueOrNull("$name", item.Name);
+                    cmd.AddWithValueOrNull("$prefab", item.Prefab != null ? item.Prefab : "ItemObject");
+                    cmd.AddWithValueOrNull("$weight", item.Weight);
+                    cmd.AddWithValueOrNull("$grist", item.Grist);
+                    cmd.AddWithValueOrNull("$strifekind", item.Strifekind);
+                    cmd.AddWithValueOrNull("$weaponsprite", item.Weaponsprite);
+                    cmd.AddWithValueOrNull("$custommade", item.CustomMade == true ? "y" : "n");
+                    cmd.AddWithValueOrNull("$icon", item.Icon);
+                    cmd.AddWithValueOrNull("$description", item.Description);
+                    cmd.AddWithValueOrNull("$tags", "");
+                    cmd.AddWithValueOrNull("$speed", item.Speed);
+                    cmd.AddWithValueOrNull("$spawn", item.Spawn);
 
-                int rows = cmd.ExecuteNonQuery();
-                result = rows > 0;
+                    results.Add(cmd.ExecuteNonQuery());
+
+                    using(var transaction = connection.BeginTransaction()) {
+                        var cmdString = "INSERT INTO item_tags VALUES ($code, $tag);";
+                        foreach(var tag in item.Tags) {
+                            var tagCommand = connection.CreateCommand();
+                            tagCommand.CommandText = cmdString;
+                            tagCommand.AddWithValueOrNull("$code", item.Code);
+                            tagCommand.AddWithValueOrNull("$tag", tag);
+                            tagCommand.Transaction = transaction;
+                            results.Add(tagCommand.ExecuteNonQuery());
+                        }
+                        transaction.Commit();
+                    }
+                }
             }
-            return Task.FromResult(result);
+            return Task.FromResult(results.Sum() > 0);
         }
 
         public Task<bool> UpdateItem(Item item) {
-            bool result = false;
-            using (var connection = new SqliteConnection($"Data Source={dbPath}"))
-            {
-                connection.Open();
-                var cmd = connection.CreateCommand();
-                cmd.CommandText = "UPDATE items SET name = $name, prefab = $prefab, weight = $weight, grist = $grist, strifekind = $strifekind, weaponsprite = $weaponsprite, custommade = $custommade, icon = $icon, description = $description, tags = $tags, speed = $speed, spawn = $spawn WHERE code = $code;";
-                cmd.AddWithValueOrNull("$code", item.Code);
-                cmd.AddWithValueOrNull("$name", item.Name);
-                cmd.AddWithValueOrNull("$prefab", item.Prefab != null ? item.Prefab : "ItemObject");
-                cmd.AddWithValueOrNull("$weight", item.Weight);
-                cmd.AddWithValueOrNull("$grist", item.Grist);
-                cmd.AddWithValueOrNull("$strifekind", item.Strifekind);
-                cmd.AddWithValueOrNull("$weaponsprite", item.Weaponsprite);
-                cmd.AddWithValueOrNull("$custommade", item.CustomMade == true ? "y" : "n");
-                cmd.AddWithValueOrNull("$icon", item.Icon);
-                cmd.AddWithValueOrNull("$description", item.Description);
-                cmd.AddWithValueOrNull("$tags", string.Join(",", item.Tags));
-                cmd.AddWithValueOrNull("$speed", item.Speed);
-                cmd.AddWithValueOrNull("$spawn", item.Spawn);
-
-                int rows = cmd.ExecuteNonQuery();
-                result = rows > 0;
-            }
-            return Task.FromResult(result);
+            DeleteItem(item.Code);
+            return CreateItem(item);
         }
 
         public Task<Item> GetItem(string code) {
@@ -139,6 +124,18 @@ namespace ItemDBEditor.Data {
             {
                 connection.Open();
                 var cmd = connection.CreateCommand();
+                
+                List<string> tags = new List<string>();
+                cmd.CommandText = "SELECT tag FROM item_tags WHERE item = $code;";
+                cmd.Parameters.AddWithValue("$code", code);
+                using(var reader = cmd.ExecuteReader()) {
+                    while(reader.Read()) {
+                        string tag = reader["tag"] as string;
+                        tags.Add(tag);
+                    }
+                }
+
+                cmd = connection.CreateCommand();
                 cmd.CommandText = "SELECT * FROM items WHERE code = $code;";
                 cmd.Parameters.AddWithValue("$code", code);
 
@@ -155,7 +152,6 @@ namespace ItemDBEditor.Data {
                         bool customMade = (reader["custommade"] as string) == "y";
                         string icon = reader["icon"] as string;
                         string description = reader["description"] as string;
-                        List<string> tags = TagStringToList(reader["tags"] as string);
                         long speed = (long)reader["speed"];
                         bool spawn = ((long)reader["spawn"]) == 1;
                         item = new Item(
@@ -183,8 +179,23 @@ namespace ItemDBEditor.Data {
             using(var connection = new SqliteConnection($"Data Source={dbPath}")) {
                 connection.Open();
                 var cmd = connection.CreateCommand();
-                cmd.CommandText = "SELECT * FROM items;";
 
+                Dictionary<string, List<string>> tags = new Dictionary<string, List<string>>();
+                cmd.CommandText = "SELECT * FROM item_tags;";
+                using(var reader = cmd.ExecuteReader()) {
+                    while(reader.Read()) {
+                        string item = reader["item"] as string;
+                        string tag = reader["tag"] as string;
+                        
+                        if(!tags.ContainsKey(item)) {
+                            tags.Add(item, new List<string>());
+                        }
+                        var list = tags[item];
+                        list.Add(tag);
+                    }
+                }
+
+                cmd.CommandText = "SELECT * FROM items;";
                 using(var reader = cmd.ExecuteReader()) {
                     while(reader.Read()) {
                         string code = reader["code"] as string;
@@ -197,7 +208,8 @@ namespace ItemDBEditor.Data {
                         bool customMade = (reader["custommade"] as string) == "y";
                         string icon = reader["icon"] as string;
                         string description = reader["description"] as string;
-                        List<string> tags = TagStringToList(reader["tags"] as string);
+                        if(!tags.ContainsKey(code)) tags.Add(code, new List<string>());
+                        List<string> itemTags = tags[code];
                         long speed = (long)reader["speed"];
                         bool spawn = ((long)reader["spawn"]) == 1;
 
@@ -212,7 +224,7 @@ namespace ItemDBEditor.Data {
                         customMade,
                         icon,
                         description,
-                        tags,
+                        itemTags,
                         speed,
                         spawn));
                     }
