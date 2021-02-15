@@ -90,7 +90,7 @@ namespace ItemDBEditor.Data {
                     cmd.AddWithValueOrNull("$custommade", item.CustomMade == true ? "y" : "n");
                     cmd.AddWithValueOrNull("$icon", item.Icon);
                     cmd.AddWithValueOrNull("$description", item.Description);
-                    cmd.AddWithValueOrNull("$tags", "");
+                    cmd.AddWithValueOrNull("$tags", string.Join(',', item.Tags));
                     cmd.AddWithValueOrNull("$speed", item.Speed);
                     cmd.AddWithValueOrNull("$spawn", item.Spawn);
 
