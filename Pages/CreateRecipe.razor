@@ -48,7 +48,21 @@
     protected override async Task OnInitializedAsync()
     {
         Items = await ItemsDB.GetItems();
+        Method = "AND";
     }
+
+    [Inject]
+    IJSRuntime JSRuntime { get; set; }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender) {
+            await JSRuntime.InvokeVoidAsync("InitSelectPickerPlugin");
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    
 
     private async void SaveRecipe() {
         if(string.IsNullOrEmpty(ItemA) || string.IsNullOrEmpty(ItemB) || string.IsNullOrEmpty(Method) || string.IsNullOrEmpty(Result)) {
@@ -72,4 +86,4 @@
         await ItemsDB.CreateRecipe(recipe);
         NavManager.NavigateTo("/recipes");
     }
-}
+}    protected override Task
