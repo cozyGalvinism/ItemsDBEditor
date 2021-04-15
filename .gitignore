@@ -294,3 +294,4 @@ obj/
 *.zip
 items.db
 items.ldb
+items-log.ldb
