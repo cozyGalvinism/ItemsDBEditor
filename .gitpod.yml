@@ -1,3 +1,4 @@
 image: gitpod/workspace-dotnet
-ports:
-- port: 80
+vscode:
+  extensions:
+  - muhammad-sammy.csharp

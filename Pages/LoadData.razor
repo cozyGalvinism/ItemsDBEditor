@@ -44,16 +44,17 @@
                     <td>@item.Code</td>
                     <td>@item.Name</td>
                     <td>@item.Prefab</td>
-                    <td>@item.Weight</td>
                     <td>@item.Grist</td>
                     <td>@item.Strifekind</td>
                     <td>@item.Weaponsprite</td>
-                    <td>@item.CustomMade</td>
+                    <td>@item.Custom</td>
                     <td>@item.Icon</td>
                     <td>@item.Description</td>
                     <td>@string.Join(", ", item.Tags)</td>
                     <td>@item.Speed</td>
                     <td>@item.Spawn</td>
+                    <td>@string.Join(", ", item.Aliases)</td>
+                    <td>@item.Prototyping</td>
                     <td><a name="edit-item-btn" id="edit-item-@item.Code" class="btn btn-primary" href="/edit/@item.Code" role="button">Edit</a></td>
                     <td><button class="btn btn-primary" @onclick="@(() => DeleteItem(@item.Code))">Delete</button></td>
                 </tr>
@@ -64,11 +65,11 @@
 
 @code {
 
-    private List<Item> items;
+    private List<LDBItem> items;
     private IFileListEntry file;
     private bool FileAvailable {
         get {
-            return System.IO.File.Exists("items.db");
+            return System.IO.File.Exists("items.ldb");
         }
     }
 
@@ -88,7 +89,7 @@
     }
 
     private async Task Process() {
-        var fs = System.IO.File.Create("items.db");
+        var fs = System.IO.File.Create("items.ldb");
         await file.Data.CopyToAsync(fs);
         fs.Close();
         items = await ItemsDB.GetItems();

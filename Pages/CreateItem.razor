@@ -20,11 +20,6 @@
 	</div>
 
 	<div class="form-group">
-		<label for="field-Weight"><b>Weight</b><span class="validation-message">*</span></label>
-		<input type="number" name="form-control" id="field-Weight" class="form-control" placeholder="" @bind="@Weight" required>
-	</div>
-
-	<div class="form-group">
 		<label for="field-Grist"><b>Grist</b><span class="validation-message">*</span></label>
 		<input type="number" name="form-control" id="field-Grist" class="form-control" placeholder="" @bind="@Grist" required>
 	</div>
@@ -68,6 +63,17 @@
         <input type="checkbox" name="form-control" id="field-Spawn" class="form-check-input" placeholder="" @bind="@Spawn">
         <label for="field-Spawn" class="form-check-label"><b>Spawn</b></label>
     </div>
+
+	<div class="form-group">
+		<label for="field-Aliases"><b>Aliases</b></label>
+		<input type="text" name="form-control" id="field-Aliases" class="form-control" placeholder="" @bind="@Aliases">
+	</div>
+
+	<div class="form-group">
+		<label for="field-Prototyping"><b>Prototyping</b></label>
+		<input type="text" name="form-control" id="field-Prototyping" class="form-control" placeholder="" @bind="@Prototyping">
+	</div>
+
     <span class="validation-message">* Field is required</span>
 	<br/>
     <button type="submit" class="btn btn-primary" @onclick="SaveItem">Save</button>
@@ -77,36 +83,38 @@
     public string Code { get; set; }
     public string Name { get; set; }
     public string Prefab { get; set; }
-    public double Weight { get; set; }
-    public long Grist { get; set; }
+    public int Grist { get; set; }
     public string Strifekind { get; set; }
     public string Weaponsprite { get; set; }
     public bool CustomMade { get; set; }
     public string Icon { get; set; }
     public string Description { get; set; }
     public string Tags { get; set; }
-    public long Speed { get; set; }
+    public int Speed { get; set; }
     public bool Spawn { get; set; }
-    private Item item;
+	public string Aliases { get; set; }
+	public string Prototyping { get; set; }
+    private LDBItem item;
 
     private async void SaveItem()
     {
         if (string.IsNullOrEmpty(Code) || string.IsNullOrEmpty(Name) || string.IsNullOrEmpty(Prefab) || string.IsNullOrEmpty(Icon)) return;
 
-        item = new Item();
+        item = new LDBItem();
         item.Code = Code;
         item.Name = Name;
         item.Prefab = Prefab;
-        item.Weight = Weight;
         item.Grist = Grist;
         item.Strifekind = Strifekind;
         item.Weaponsprite = Weaponsprite;
-        item.CustomMade = CustomMade;
+        item.Custom = CustomMade;
         item.Icon = Icon;
         item.Description = Description;
         item.Tags = Tags == null ? new List<string>() : Tags.Split(",").Select(t => t.Trim()).ToList();
         item.Speed = Speed;
         item.Spawn = Spawn;
+		item.Aliases = Aliases == null ? new List<string>() : Aliases.Split(",").Select(t => t.Trim()).ToList();
+		item.Prototyping = Prototyping;
         bool success = await ItemsDB.CreateItem(item);
         NavManager.NavigateTo("/");
     }

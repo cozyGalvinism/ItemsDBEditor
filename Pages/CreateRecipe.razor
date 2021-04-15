@@ -1,0 +1,68 @@
+@page "/createrecipe"
+
+@using ItemDBEditor.Data
+@inject ItemService ItemsDB
+@inject NavigationManager NavManager
+
+<form action="javascript:void(0);">
+    <div class="form-group">
+        <label for="field-ItemA"><b>ItemA</b><span class="validation-message">*</span></label>
+		<input type="text" name="form-control" id="field-ItemA" class="form-control" placeholder="" @bind="@ItemA" required>
+	</div>
+
+    <div class="form-group">
+        <label for="field-ItemB"><b>ItemB</b><span class="validation-message">*</span></label>
+		<input type="text" name="form-control" id="field-ItemB" class="form-control" placeholder="" @bind="@ItemB" required>
+	</div>
+
+    <div class="form-group">
+        <label for="field-Method"><b>Method</b><span class="validation-message">*</span></label>
+        <select name="form-select" id="field-Method" class="form-select" @bind="@Method">
+            <option value="AND" selected>&&</option>
+            <option value="OR">||</option>
+        </select>
+	</div>
+
+    <div class="form-group">
+        <label for="field-Result"><b>Result</b><span class="validation-message">*</span></label>
+        <select name="form-select" id="field-Result" class="selectpicker" data-show-subtext="true" data-live-search="true" @bind="@Result" required>
+            @foreach (var item in Items)
+            {
+                <option value="@item.Code" data-tokens='@string.Join(" ", item.Aliases)' data-subtext="@item.Name">@item.Code</option>
+            }
+        </select>
+		<input type="text" name="form-control" id="field-Result" class="form-control" placeholder="" @bind="@Result" required>
+	</div>
+
+    <span class="validation-message">* Field is required</span>
+	<br/>
+    <button type="submit" class="btn btn-primary" @onclick="SaveRecipe">Save</button>
+</form>
+
+@code {
+    public List<LDBItem> Items { get; set; }
+    public string ItemA { get; set; }
+    public string ItemB { get; set; }
+    public string Result { get; set; }
+    public string Method { get; set; }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        Items = await ItemsDB.GetItems();
+    }
+
+    private async void SaveRecipe() {
+        if(string.IsNullOrEmpty(ItemA) || string.IsNullOrEmpty(ItemB) || string.IsNullOrEmpty(Method) || string.IsNullOrEmpty(Result)) return;
+        var resultItem = await ItemsDB.GetItem(Result);
+        if(resultItem == null) return;
+        var method = (LDBRecipe.Methods)Enum.Parse(typeof(LDBRecipe.Methods), Method);
+        LDBRecipe recipe = new LDBRecipe {
+            ItemA = ItemA,
+            ItemB = ItemB,
+            Method = method,
+            Result = resultItem
+        };
+        await ItemsDB.CreateRecipe(recipe);
+        NavManager.NavigateTo("/recipes");
+    }
+}
