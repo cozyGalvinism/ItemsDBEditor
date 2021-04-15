@@ -66,14 +66,7 @@
     
 
     private async void SaveRecipe() {
-        if(string.IsNullOrEmpty(ItemA) || string.IsNullOrEmpty(ItemB) || string.IsNullOrEmpty(Method) || string.IsNullOrEmpty(Result)) {
-            Console.WriteLine("Something is empty...");
-            Console.WriteLine($"ItemA: {ItemA}");
-            Console.WriteLine($"ItemB: {ItemB}");
-            Console.WriteLine($"Method: {Method}");
-            Console.WriteLine($"Result: {Result}");
-            return;
-        }
+        if(string.IsNullOrEmpty(ItemA) || string.IsNullOrEmpty(ItemB) || string.IsNullOrEmpty(Method) || string.IsNullOrEmpty(Result)) return;
 
         var resultItem = await ItemsDB.GetItem(Result);
         if(resultItem == null) return;
