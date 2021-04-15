@@ -1,0 +1,48 @@
+@page "/recipes"
+@using ItemDBEditor.Data
+@inject ItemService ItemsDB
+@inject NavigationManager NavManager
+
+@if (recipes != null) {
+    <a href="/createrecipe" class="btn btn-primary">Create new Recipe</a>
+    <hr>
+} 
+<h1>Recipes</h1>
+
+<table class="table">
+        <thead>
+            <tr>
+                <th>Item A</th>
+                <th>Method</th>
+                <th>Item B</th>
+                <th>Result</th>
+                <th />
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var recipe in recipes)
+            {
+                <tr>
+                    <td>@recipe.ItemA</td>
+                    <td>@recipe.MethodString()</td>
+                    <td>@recipe.ItemB</td>
+                    <td>@recipe.Result.Code</td>
+                    <td><button class="btn btn-primary" @onclick="@(() => DeleteRecipe(@recipe.ItemA, @recipe.ItemB, @recipe.Method))">Delete</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+@code {
+
+    private List<LDBRecipe> recipes;
+
+    protected override async Task OnInitializedAsync() {
+        recipes = await ItemsDB.GetRecipes();
+    }
+
+    private async void DeleteRecipe(string itemA, string itemB, LDBRecipe.Methods method) {
+        await ItemsDB.DeleteRecipe(itemA, itemB, method);
+        NavManager.NavigateTo("/recipes", true);
+    }
+}
