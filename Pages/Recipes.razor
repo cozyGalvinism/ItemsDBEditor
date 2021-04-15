@@ -13,8 +13,8 @@
         <thead>
             <tr>
                 <th>Item A</th>
-                <th>Item B</th>
                 <th>Method</th>
+                <th>Item B</th>
                 <th>Result</th>
                 <th />
             </tr>
@@ -24,8 +24,8 @@
             {
                 <tr>
                     <td>@recipe.ItemA</td>
-                    <td>@recipe.ItemB</td>
                     <td>@recipe.MethodString()</td>
+                    <td>@recipe.ItemB</td>
                     <td>@recipe.Result.Code</td>
                     <td><button class="btn btn-primary" @onclick="@(() => DeleteRecipe(@recipe.ItemA, @recipe.ItemB, @recipe.Method))">Delete</button></td>
                 </tr>
