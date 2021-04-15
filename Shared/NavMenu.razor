@@ -1,18 +1,19 @@
-﻿<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+﻿<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3 fixed-top">
     <div class="container">
-        <a class="navbar-brand" href="">ItemsDBEditor</a>
-        <button class="navbar-toggler" type="button" @onclick="ToggleNavMenu">
+        <a class="navbar-brand text-light" href="">ItemsDBEditor</a>
+        <button class="navbar-toggler" type="button" @onclick="ToggleNavMenu" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="@NavMenuCssClass"  @onclick="ToggleNavMenu">
             <ul class="navbar-nav flex-grow-1">
                 <li class="nav-item">
-                    <NavLink class="nav-link text-dark" href="" Match="NavLinkMatch.All">
+                    <NavLink class="nav-link text-light" href="" Match="NavLinkMatch.All">
                         Items
                     </NavLink>                
                 </li>
                 <li class="nav-item">
-                    <NavLink class="nav-link text-dark" href="recipes">
+                    <NavLink class="nav-link text-light" href="recipes">
                         Recipes
                     </NavLink>
                 </li>
