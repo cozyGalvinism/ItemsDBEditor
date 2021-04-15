@@ -3,8 +3,7 @@
 @inject ItemService ItemsDB
 @inject NavigationManager NavManager
 
-<div class="row">
-    @if (recipes != null) {
+@if (recipes != null) {
     <a href="/createrecipe" class="btn btn-primary">Create new Recipe</a>
     <hr>
 } 
@@ -33,7 +32,6 @@
             }
         </tbody>
     </table>
-</div>
 
 @code {
 
