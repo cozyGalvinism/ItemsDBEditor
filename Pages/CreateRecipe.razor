@@ -49,6 +49,7 @@
     {
         Items = await ItemsDB.GetItems();
         Method = "AND";
+        Result = Items.FirstOrDefault().Code;
     }
 
     [Inject]
