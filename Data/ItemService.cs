@@ -6,7 +6,7 @@ using LiteDB;
 
 namespace ItemDBEditor.Data {
 
-    public class ItemService
+    public class ItemService : IDisposable
     {
         private string _dbPath = "items.ldb";
         private LiteDatabase _ldb;
@@ -86,6 +86,11 @@ namespace ItemDBEditor.Data {
             var recipes = new List<LDBRecipe>();
             recipes = _recipeCollection.FindAll().ToList();
             return Task.FromResult(recipes);
+        }
+
+        public void Dispose()
+        {
+            _ldb.Dispose();
         }
     }
 }
