@@ -56,7 +56,7 @@
                     <td>@item.Spawn</td>
                     <td>@string.Join(", ", item.Aliases)</td>
                     <td>@item.Prototyping</td>
-                    <td><a name="edit-item-btn" id="edit-item-@item.Code" class="btn btn-primary" href="/edit/@item.Code" role="button">Edit</a></td>
+                    <td><a name="edit-item-btn" id="edit-item-@item.Code" class="btn btn-primary" href="/edit/@Uri.EscapeDataString(item.Code)" role="button">Edit</a></td>
                     <td><button class="btn btn-primary" @onclick="@(() => DeleteItem(@item.Code))">Delete</button></td>
                 </tr>
             }
